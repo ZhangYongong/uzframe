@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ughen.mapper.ResourceMapper">
+
+    <select id="get" resultType="com.ughen.model.db.Resource">
+		select `id`,`name`,`url`,`description`,`icon`,`pid`,`seq`,`is_deleted` as isDeleted,`opened`,`resource_type` as resourceType,`create_time` as createTime
+		from uz_resource where id = #{value}
+	</select>
+
+    <select id="list" resultType="com.ughen.model.db.Resource">
+        select
+          `id`,`name`,`url`,`description`,`pid`,`seq`,`is_deleted` as isDeleted,`opened`,`resource_type` as resourceType,`create_time` as createTime
+        from
+          uz_resource
+        <where>
+            <if test="id != null and id != ''">and id = #{id}</if>
+            <if test="name != null and name != ''">and name = #{name}</if>
+            <if test="url != null and url != ''">and url = #{url}</if>
+            <if test="description != null and description != ''">and description = #{description}</if>
+            <if test="pid != null and pid != ''">and pid = #{pid}</if>
+            <if test="seq != null and seq != ''">and seq = #{seq}</if>
+            <if test="isDeleted != null and isDeleted != ''">and is_deleted = #{isDeleted}</if>
+            <if test="opened != null and opened != ''">and opened = #{opened}</if>
+            <if test="resourceType != null and resourceType != ''">and resource_type = #{resourceType}</if>
+            <if test="createTime != null and createTime != ''">and create_time = #{createTime}</if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.ughen.model.db.Resource" useGeneratedKeys="true" keyProperty="id">
+		insert into uz_resource
+		(
+			`name`, 
+			`url`, 
+			`description`, 
+			`pid`,
+			`seq`, 
+			`is_deleted`,
+			`opened`, 
+			`resource_type`, 
+			`create_time`
+		)
+		values
+		(
+			#{name}, 
+			#{url}, 
+			#{description}, 
+			#{pid},
+			#{seq}, 
+			#{isDeleted},
+			#{opened}, 
+			#{resourceType}, 
+			#{createTime}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.ughen.model.db.Resource">
+        update uz_resource
+        <set>
+            <if test="name != null">`name` = #{name},</if>
+            <if test="url != null">`url` = #{url},</if>
+            <if test="description != null">`description` = #{description},</if>
+            <if test="pid != null">`pid` = #{pid},</if>
+            <if test="seq != null">`seq` = #{seq},</if>
+            <if test="isDeleted != null">`is_deleted` = #{isDeleted},</if>
+            <if test="opened != null">`opened` = #{opened},</if>
+            <if test="resourceType != null">`resource_type` = #{resourceType},</if>
+            <if test="createTime != null">`create_time` = #{createTime}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="remove">
+		delete from uz_resource where id = #{value}
+	</delete>
+
+    <delete id="batchRemove">
+        delete from uz_resource where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectCloseResource" resultType="java.lang.String">
+        select
+        url
+        from
+        uz_resource
+        <where>
+            is_deleted = 0 and opened = 1
+        </where>
+    </select>
+</mapper>

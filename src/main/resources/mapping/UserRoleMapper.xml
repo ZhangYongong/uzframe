@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ughen.mapper.UserRoleMapper">
+
+    <select id="get" resultType="com.ughen.model.db.UserRole">
+		select `id`,`user_id`,`role_id` from uz_user_role where id = #{value}
+	</select>
+
+    <select id="list" resultType="com.ughen.model.db.UserRole">
+        select `id`,`user_id`,`role_id` from uz_user_role
+        <where>
+            <if test="id != null and id != ''">and id = #{id}</if>
+            <if test="userId != null and userId != ''">and user_id = #{userId}</if>
+            <if test="roleId != null and roleId != ''">and role_id = #{roleId}</if>
+        </where>
+    </select>
+
+
+    <insert id="save" parameterType="com.ughen.model.db.UserRole" useGeneratedKeys="true" keyProperty="id">
+		insert into uz_user_role
+		(
+			`user_id`, 
+			`role_id`
+		)
+		values
+		(
+			#{userId}, 
+			#{roleId}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.ughen.model.db.UserRole">
+        update uz_user_role
+        <set>
+            <if test="userId != null">`user_id` = #{userId},</if>
+            <if test="roleId != null">`role_id` = #{roleId}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="remove">
+		delete from uz_user_role where id = #{value}
+	</delete>
+
+    <delete id="batchRemove">
+        delete from uz_user_role where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <select id="selectByUserId" resultType="java.lang.Long">
+        select role_id from uz_user_role where user_id = #{userId}
+    </select>
+
+    <select id="selectRoleByUserId" resultType="com.ughen.model.db.Role">
+        select
+        ur.id,ur.name
+        from
+        uz_user_role uuz
+        LEFT JOIN
+        uz_role ur
+        ON
+        ur.id = uuz.role_id
+        where
+        uuz.user_id = #{userId}
+    </select>
+
+    <insert id="insertUserRoles" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into uz_user_role
+        (user_id,role_id)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.userId},#{item.roleId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByUserId">
+        delete from uz_user_role where user_id = #{userId}
+    </delete>
+
+
+</mapper>

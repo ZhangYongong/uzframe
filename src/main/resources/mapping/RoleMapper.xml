@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ughen.mapper.RoleMapper">
+
+    <select id="get" resultType="com.ughen.model.db.Role">
+		select
+		  `id`,`name`,`seq`,`description`
+		from
+		  uz_role
+		where
+		  id = #{value} and is_deleted = 0
+	</select>
+
+    <select id="list" resultType="com.ughen.model.db.Role">
+        select `id`,`name`,`seq`,`description`,`is_deleted` as isDeleted from uz_role
+        <where>
+            is_deleted = 0
+            <if test="id != null and id != ''">and id = #{id}</if>
+            <if test="name != null and name != ''">and name = #{name}</if>
+            <if test="seq != null and seq != ''">and seq = #{seq}</if>
+            <if test="description != null and description != ''">and description = #{description}</if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.ughen.model.db.Role" useGeneratedKeys="true" keyProperty="id">
+		insert into uz_role
+		(
+			`name`, 
+			`seq`, 
+			`description`, 
+			`is_deleted`
+		)
+		values
+		(
+			#{name}, 
+			#{seq}, 
+			#{description}, 
+			#{isDeleted}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.ughen.model.db.Role">
+        update uz_role
+        <set>
+            <if test="name != null">`name` = #{name},</if>
+            <if test="seq != null">`seq` = #{seq},</if>
+            <if test="description != null">`description` = #{description},</if>
+            <if test="isDeleted != null">`is_deleted` = #{isDeleted}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="remove">
+		delete from uz_role where id = #{value}
+	</delete>
+
+    <delete id="batchRemove">
+        delete from uz_role where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

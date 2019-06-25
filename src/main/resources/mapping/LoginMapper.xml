@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ughen.mapper.LoginMapper">
+    <insert id="insert" parameterType="com.ughen.model.db.User" useGeneratedKeys="true"
+            keyProperty="userId">
+        INSERT INTO uz_frame_user (mobile, password, platform, nickname)
+        VALUES (#{mobile}, #{password}, #{platform}, #{nickname})
+    </insert>
+    <insert id="addThird" parameterType="java.util.Map">
+        insert into uz_frame_userthird (addTime, uid, userId, source)
+        VALUES (now(), #{uid}, #{userId}, #{source});
+    </insert>
+    <update id="update" parameterType="com.ughen.model.db.User">
+        UPDATE uz_frame_user SET
+        <if test="deleteStatus != null">
+            deleteStatus = #{deleteStatus}
+        </if>
+        <if test="mobile != null and '' != mobile">
+            mobile = #{mobile}
+        </if>
+        <if test="password != null and '' != password">
+            password = #{password}
+        </if>
+        <if test="mail != null and '' != mail">
+            mail = #{mail}
+        </if>
+        <if test="username != null and '' != username">
+            username = #{username}
+        </if>
+        where id = #{id} and deleteStatus = 0
+    </update>
+    <update id="updateThird" parameterType="java.util.Map">
+        update uz_frame_userthird
+        set uid = #{uid}
+        where userId = #{userId}
+          and source = #{source};
+    </update>
+    <delete id="delete">
+        delete
+        from uz_frame_user
+        where id = #{id}
+    </delete>
+    <select id="select" parameterType="com.ughen.model.db.User"
+            resultType="com.ughen.model.db.User">
+        SELECT
+        u.id as userId,
+        u.password,
+        u.nickname,
+        u.headImgPath,
+        u.platform
+        from uz_frame_user u
+        where deleteStatus = 0 and platform = #{platform}
+        <if test="mobile != null and ''!=mobile">
+            and mobile = #{mobile}
+        </if>
+        <if test="mail != null and '' != mail">
+            and mail = #{mail}
+        </if>
+        <if test="username != null and '' != username">
+            and username = #{username}
+        </if>
+    </select>
+    <select id="getUserByThirdUid" parameterType="java.util.Map"
+            resultType="com.ughen.model.db.User">
+        select
+            u.id as userId,
+            u.nickname,
+            u.headImgPath,
+            u.platform
+        from uz_frame_user u
+                 left join uz_frame_userthird ut
+                           on u.id = ut.userId
+        where ut.uid = #{uid}
+          and u.deleteStatus = 0
+    </select>
+    <select id="getThird" resultType="com.ughen.model.db.ThirdInfo">
+        select ut.*,u.nickname
+        from uz_frame_userthird ut ,uz_frame_user u
+        where ut.userId = u.id
+        <if test="userId != null">
+            and ut.userId = #{userId}
+        </if>
+        <if test="uid != null">
+            and ut.uid = #{uid}
+        </if>
+        and source = #{source};
+    </select>
+
+
+</mapper>
